@@ -1,5 +1,6 @@
 
 var collectURL = 'dc/collect.php';
+var checkURL = 'dc/check.php';
 var expiration = 3650;
 
 function getCookie(c_name)
@@ -59,7 +60,7 @@ function pageView(aid, eid)
 		/* if not, set it on */
 		setCookie('_dci', 1, expiration);
 		/* and check remotely */
-		if (checkCookieExist(cookie) == false)
+		if (checkCookieExist(cookie) == 'exist')
 		{
 			/* if not exist, send user information */
 			sendUserInfo();
@@ -86,7 +87,15 @@ function sendUserInfo()
 
 
 function checkCookieExist(cookie)
-{	
-	//TODO
-	return false;
+{
+	var res;
+	$.ajax({
+		url	:	checkURL,
+		data	:	{"cookie" : cookie},
+		dataType:	"text",
+		success	:	function (data, textStatus, jqXHR) {
+					res = data;
+				}
+	});
+	return res;
 }
