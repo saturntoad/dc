@@ -1,3 +1,7 @@
+
+var collectURL = 'dc/collect.php';
+var expiration = 3650;
+
 function getCookie(c_name)
 {
 	var c_value = document.cookie;
@@ -40,12 +44,12 @@ function pageView(aid, eid)
 		"url"		:	window.location.href,
 		"aid"		:	aid,
 		"eid"		:	eid,
-		"t"			:	new Date().getTime()
+		"t"		:	new Date().getTime()
 	};
 	if (typeof prod == 'undefined')
 		console.log(newPV);
 	$.ajax({
-		url		:	'dc/test.php',
+		url	:	collectURL,
 		data	:	newPV
 	});
 
@@ -53,7 +57,7 @@ function pageView(aid, eid)
 	if (null == getCookie('_dci'))
 	{
 		/* if not, set it on */
-		setCookie('_dci', 1, 3650);
+		setCookie('_dci', 1, expiration);
 		/* and check remotely */
 		if (checkCookieExist(cookie) == false)
 		{
@@ -69,7 +73,7 @@ function sendUserInfo()
 	var newUser = {
 		"cookie"	:	cookie,
 		"uid"		:	0,
-		"t"			:	new Date().getTime()
+		"t"		:	new Date().getTime()
 	};
 	/* check if logged in, var uid is set by server side php code */
 	if (uid)
