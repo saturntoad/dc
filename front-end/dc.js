@@ -1,6 +1,7 @@
 
 var collectURL = 'dc/collect.php';
 var checkURL = 'dc/check.php';
+var sendUserURL = 'dc/user.php';
 var expiration = 3650;
 
 function getCookie(c_name)
@@ -45,14 +46,9 @@ function pageView(aid, eid)
 		"url"		:	window.location.href,
 		"aid"		:	aid,
 		"eid"		:	eid,
-		"t"		:	new Date().getTime()
 	};
 	if (typeof prod == 'undefined')
 		console.log(newPV);
-	$.ajax({
-		url	:	collectURL,
-		data	:	newPV
-	});
 
 	/* check if that cookie already exists locally */
 	if (null == getCookie('_dci'))
@@ -60,42 +56,55 @@ function pageView(aid, eid)
 		/* if not, set it on */
 		setCookie('_dci', 1, expiration);
 		/* and check remotely */
-		if (checkCookieExist(cookie) == 'exist')
-		{
-			/* if not exist, send user information */
-			sendUserInfo();
-		}
+		$.ajax({
+			url	:	checkURL,
+			data	:	{"cookie" : cookie},
+			dataType:	"text",
+			success	:	function (data, textStatus, jqXHR) {
+					if (data == 'error') {
+						/* if not exist, send user information */
+						sendUserInfoAndPageView(newPV);
+					}
+					else {
+						sendPageView(newPV);
+					}
+				}
+		});
 	}
+	else
+	{
+		sendPageView(newPV);
+	}
+
+
 }
 
-function sendUserInfo()
+function sendUserInfoAndPageView(newPV)
 {
 	var cookie = getCookie('_ga');
 	var newUser = {
 		"cookie"	:	cookie,
 		"uid"		:	0,
-		"t"		:	new Date().getTime()
 	};
 	/* check if logged in, var uid is set by server side php code */
 	if (uid)
 	{
 		newUser.uid = uid;
 	}
+	$.ajax({
+		url	:	sendUserURL,
+		data	:	newUser,
+		success	:	function (data, textStatus, jqXHR) {
+					sendPageView(newPV);
+				}
+	});
 	console.log(newUser);
 }
 
-
-
-function checkCookieExist(cookie)
+function sendPageView(newPV)
 {
-	var res;
 	$.ajax({
-		url	:	checkURL,
-		data	:	{"cookie" : cookie},
-		dataType:	"text",
-		success	:	function (data, textStatus, jqXHR) {
-					res = data;
-				}
+		url	:	collectURL,
+		data	:	newPV
 	});
-	return res;
 }

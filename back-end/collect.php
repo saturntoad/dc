@@ -2,7 +2,7 @@
 include 'collector.php';
 include 'mongoCollector.php';
 
-$collector = 'MongoCollector';
+$collector = 'Collector';
 
 if (isset($_REQUEST['url'])) {
 	$collector::saveToDB($_REQUEST, 'action');
